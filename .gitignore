@@ -21,6 +21,9 @@ app/excel_templates/*_导出_*.xlsx
 # 验证/测试脚本与临时产物
 work/
 
+# 部署包构建产物（dist/*.zip 由打包脚本生成，不入库）
+dist/
+
 # WorkBuddy 工作区内部记忆
 .workbuddy/
 

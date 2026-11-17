@@ -5,7 +5,13 @@ from .db import close_db, init_db
 
 
 def create_app():
-    app = Flask(__name__, template_folder="templates", static_folder="static")
+    # 显式绝对路径：打包成 exe 后 Flask 的 root_path 会变成 _MEIPASS，需精确指向 app 目录
+    import os
+    app = Flask(
+        __name__,
+        template_folder=os.path.join(config.APP_DIR, "templates"),
+        static_folder=os.path.join(config.APP_DIR, "static"),
+    )
     app.config["SECRET_KEY"] = config.SECRET_KEY
     app.config["SESSION_COOKIE_HTTPONLY"] = config.SESSION_COOKIE_HTTPONLY
     app.config["SESSION_COOKIE_SAMESITE"] = config.SESSION_COOKIE_SAMESITE

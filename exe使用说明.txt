@@ -1,0 +1,70 @@
+短租箱 EIR 生成系统 —— 免安装 exe 版使用说明
+================================================
+
+运行环境：Windows 10 / 11 或 Windows Server 2016 及以上（64 位）。
+          不需要安装 Python，也不需要联网。
+
+一、运行
+  1. 把 短租箱EIR系统.exe 放到一个「有写入权限」的目录，例如 D:\短租箱EIR 或桌面。
+     注意：不要放到 C:\Program Files 下（无写入权限会导致启动失败）。
+  2. 双击 短租箱EIR系统.exe。
+  3. 稍等 2~5 秒，会自动打开浏览器；若没打开，手动访问：
+         本机：      http://localhost:8888
+         局域网：    http://本机IP:8888
+  4. 关闭黑色命令行窗口 = 停止服务。
+
+  默认账号：
+      admin / admin123    管理员
+      front / front123    前台录入
+      print / print123    打印员
+  ★ 正式使用前请登录后台修改密码。
+
+二、数据放在哪里
+  exe 首次运行会在自己旁边自动创建以下目录（可整体备份/迁移）：
+
+     短租箱EIR系统.exe
+     data\eir.db              ← 全部业务数据（最重要）
+     uploads\release_notes\   ← 起租号上传的放箱通知图片
+     backups\                 ← 系统自动/手动备份
+     excel_templates\         ← 导入模板、Excel 导出文件
+     宁波FREEUSE提箱.xlsx     ← 首次导入用的示例数据
+
+  ★ 换电脑 / 升级 exe：只拷贝 exe 文件不会带走数据，
+    请把整个目录，或至少 data 和 uploads 两个目录一起拷贝。
+
+三、从旧版（Python 版）迁移数据
+  把旧的  app\data\eir.db  复制到 exe 同目录下的  data\eir.db
+  把旧的  app\uploads\     复制到 exe 同目录下的  uploads\
+  再启动 exe 即可，历史登记、EIR、账号、角色全部保留。
+
+  如果是从零开始、想用随包的示例数据（宁波FREEUSE提箱.xlsx）初始化，
+  在 cmd 里执行一次（仅空库生效，已有堆场数据会自动跳过）：
+        短租箱EIR系统.exe --import-excel --no-browser
+
+四、常用命令行参数
+  （在 cmd 里进入 exe 所在目录后执行）
+
+  短租箱EIR系统.exe                    默认 8888 端口，自动开浏览器
+  短租箱EIR系统.exe --port=9000        换端口（8888 被占用时自动顺延，无需手动改）
+  短租箱EIR系统.exe --no-browser       不自动开浏览器（服务器用）
+  短租箱EIR系统.exe --reset-admin      把 admin 密码重置为 admin123
+  短租箱EIR系统.exe --import-excel     导入随包 Excel 的初始数据（仅空库生效）
+
+五、局域网其它电脑访问不了？
+  1. 在跑 exe 的机器上放行防火墙 8888 端口（管理员 cmd 执行一次）：
+         netsh advfirewall firewall add rule name="ShortLeaseEIR" dir=in action=allow protocol=TCP localport=8888
+  2. 确认两台机器在同一网段，用「本机IP:8888」访问，不要用 localhost。
+  3. 本机 IP 可用 ipconfig 查看，启动窗口里也会打印出来。
+
+六、开机自动启动（可选，适合服务器常驻）
+  1. Win+R 输入 shell:startup 打开「启动」文件夹；
+  2. 把 exe 的快捷方式复制进去（快捷方式属性里「运行方式」选最小化）；
+  3. 如需免登录启动，改用「任务计划程序」创建「计算机启动时」触发的任务，
+     程序填 exe 完整路径，参数填 --no-browser。
+
+七、常见问题
+  * 双击后窗口一闪而过：说明启动报错，请在本机用 cmd 运行 exe 查看错误信息；
+    最常见原因是目录无写入权限或杀毒软件拦截，把目录换到 D 盘、exe 加入白名单即可。
+  * 首次启动稍慢（3~10 秒）：单文件 exe 需要先解压到临时目录，属正常现象。
+  * 杀毒软件报毒：PyInstaller 打包的程序常被误报，添加信任即可。
+  * 备份：直接复制 data\eir.db 就是完整备份；也可用后台的「数据备份」功能。

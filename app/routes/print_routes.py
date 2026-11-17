@@ -12,7 +12,7 @@ bp = Blueprint("print", __name__)
 
 @bp.route("/uploads/<path:filename>")
 def uploaded_file(filename):
-    return send_from_directory(os.path.join(config.BASE_DIR, "uploads"), filename)
+    return send_from_directory(config.UPLOAD_ROOT, filename)
 
 
 @bp.route("/print")
