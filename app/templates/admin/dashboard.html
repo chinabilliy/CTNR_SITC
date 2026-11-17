@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}后台管理 · 短租箱 EIR{% endblock %}
+{% block content %}
+<div class="page-head"><h1>后台管理</h1></div>
+<div class="cards">
+  <a class="stat" href="{{ url_for('admin.yards') }}"><div class="num">{{ stats.yards }}</div><div>堆场</div></a>
+  <a class="stat" href="{{ url_for('admin.batches') }}"><div class="num">{{ stats.batches }}</div><div>起租号批次</div></a>
+  <a class="stat" href="{{ url_for('admin.release_list') }}"><div class="num">{{ stats.pending }}</div><div>待放箱</div></a>
+  <a class="stat" href="{{ url_for('admin.release_list') }}"><div class="num">{{ stats.released }}</div><div>已放箱</div></a>
+  <a class="stat" href="{{ url_for('print.print_list') }}"><div class="num">{{ stats.eirs }}</div><div>EIR 总数</div></a>
+</div>
+<div class="card">
+  <h3>快捷操作</h3>
+  <p>
+    <a class="btn primary" href="{{ url_for('admin.release_list') }}">放箱确认</a>
+    <a class="btn" href="{{ url_for('front.import_excel') }}">Excel 导入</a>
+    <a class="btn" href="{{ url_for('admin.export_excel') }}">导出 Excel</a>
+    <a class="btn" href="{{ url_for('admin.users') }}">用户管理</a>
+    <a class="btn" href="{{ url_for('admin.settings') }}">系统设置</a>
+  </p>
+</div>
+{% endblock %}

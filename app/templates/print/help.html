@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}打印设置说明 · 短租箱 EIR{% endblock %}
+{% block content %}
+<div class="page-head"><h1>打印设置说明</h1></div>
+<div class="card">
+  <h3>推荐浏览器</h3>
+  <p>Chrome 或 Edge，其他浏览器可能出现分页偏差。</p>
+  <h3>打印对话框设置</h3>
+  <ul>
+    <li>纸张大小：<strong>A4</strong></li>
+    <li>方向：<strong>纵向</strong></li>
+    <li>缩放：<strong>100%</strong>（不要选"适合页面"，否则可能缩小）</li>
+    <li><strong>取消勾选"页眉和页脚"</strong>——浏览器默认页眉会打印网址，EIR 号已印在每张单据右上角</li>
+    <li>边距：默认即可（系统已按 A4 版式排好）</li>
+  </ul>
+  <h3>打印流程</h3>
+  <ol>
+    <li>在打印列表勾选提单号</li>
+    <li>核对预览页数 = EIR 张数，每页一张 EIR、一个集装箱</li>
+    <li>点「打印（将计入次数）」——系统会<strong>立即累加打印次数</strong></li>
+    <li>在打印对话框确认设置后点打印</li>
+  </ol>
+  <p>若管理员开启了「允许对已打印的 EIR 再次打印」：已打印的提单可再次勾选重印；点打印时会弹窗显示本批已打印张数与最高次数，确认后与首次打印同流程累加次数。重印开关默认关闭。</p>
+  <p class="muted">注意：点击打印按钮即计入次数，即使随后取消打印也会计数。请确认打印机就绪后再点。EIR 号与放箱图片为每张单据固定内容。</p>
+</div>
+{% endblock %}

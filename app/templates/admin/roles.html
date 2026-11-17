@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}角色管理 · 短租箱 EIR{% endblock %}
+{% block content %}
+<div class="page-head"><h1>角色管理</h1></div>
+<div class="card">
+  <p class="muted">权限点与左侧导航菜单一一对应（每个三级菜单项即一个权限点），下方按导航的模块层级分组展示。勾选后该角色即可看到并进入对应菜单；菜单有增删时，此处自动同步。内置角色不可修改或删除；自定义角色可编辑、删除，并在「用户管理」里分配给用户。</p>
+  <table class="grid">
+    <thead><tr><th>标识</th><th>名称</th><th>拥有的权限</th><th>类型</th><th>用户数</th><th>操作</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <td><code>{{ r.key }}</code></td>
+        <td>{{ r.label }}</td>
+        <td>
+          {% if r.is_builtin and 'admin' in r.perms_list %}
+            <span class="badge ok">全部权限（超级管理员）</span>
+          {% elif not r.perms_list %}
+            <span class="muted">无权限</span>
+          {% else %}
+            {% for grp in perm_groups %}
+              {% for sub in grp.groups %}
+                {% set hits = [] %}
+                {% for code, name in sub.perms %}{% if code in r.perms_list %}{% set _ = hits.append(name) %}{% endif %}{% endfor %}
+                {% if hits %}
+                  <span class="badge ok" style="margin-right:4px" title="{{ grp.label }} / {{ sub.label }}">{{ sub.label }}：{{ hits|join('、') }}</span>
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          {% endif %}
+        </td>
+        <td>{{ '内置' if r.is_builtin else '自定义' }}</td>
+        <td>{{ user_counts.get(r.key, 0) }}</td>
+        <td class="ops">
+          {% if r.is_builtin %}<span class="muted">—</span>
+          {% else %}
+          <button class="link" data-role-edit='{{ {"key": r.key, "label": r.label, "perms": r.perms_list}|tojson }}'>编辑</button>
+          <form class="inline" method="post" action="{{ url_for('admin.role_delete', key=r.key) }}">
+            <button type="submit" class="link danger" data-confirm="确定删除角色「{{ r.label }}」？">删除</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="card">
+  <h3 id="role-form-title">新增角色</h3>
+  <form method="post" action="{{ url_for('admin.role_save') }}" class="form" id="role-form">
+    <input type="hidden" name="id" id="r-id">
+    <div class="row">
+      <label>角色标识（英文，创建后不可改）<input name="key" id="r-key" required placeholder="如 operator"></label>
+      <label>角色名称<input name="label" id="r-label" required placeholder="如 前台与打印"></label>
+    </div>
+    <label>权限点（按左侧导航的模块层级分组，勾选该角色可访问的菜单）</label>
+    <div class="perm-tree">
+      {% for grp in perm_groups %}
+      <section class="perm-l1">
+        <div class="perm-l1-title">{{ grp.label }}</div>
+        {% for sub in grp.groups %}
+        <div class="perm-l2">
+          <div class="perm-l2-title">
+            <span>{{ sub.label }}</span>
+            <button type="button" class="link perm-all">全选</button>
+          </div>
+          <div class="perm-l3">
+            {% for code, name in sub.perms %}
+            <label class="perm-item"><input type="checkbox" name="perms" value="{{ code }}" class="r-perm"> {{ name }}</label>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </section>
+      {% endfor %}
+    </div>
+    <button type="submit" class="btn primary">保存</button>
+    <button type="button" class="btn" id="r-reset">清空</button>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function computeGroupState(btn){
+  var box = btn.closest('.perm-l2');
+  var all = box.querySelectorAll('.r-perm');
+  var checked = box.querySelectorAll('.r-perm:checked');
+  var full = all.length > 0 && checked.length === all.length;
+  btn.textContent = full ? '取消全选' : '全选';
+}
+document.querySelectorAll('.perm-all').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var box = this.closest('.perm-l2');
+    var items = box.querySelectorAll('.r-perm');
+    var allChecked = box.querySelectorAll('.r-perm:checked').length === items.length;
+    items.forEach(function(c){ c.checked = !allChecked; });
+    computeGroupState(this);
+  });
+  computeGroupState(btn);
+});
+document.addEventListener('change', function(e){
+  if (e.target && e.target.classList && e.target.classList.contains('r-perm')) {
+    var box = e.target.closest('.perm-l2');
+    var btn = box.querySelector('.perm-all');
+    if (btn) computeGroupState(btn);
+  }
+});
+function refreshAllGroups(){
+  document.querySelectorAll('.perm-all').forEach(computeGroupState);
+}
+document.querySelectorAll('[data-role-edit]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var d = JSON.parse(this.getAttribute('data-role-edit'));
+    document.getElementById('r-id').value = d.key;
+    document.getElementById('r-key').value = d.key;
+    document.getElementById('r-key').readOnly = true;
+    document.getElementById('r-label').value = d.label;
+    document.querySelectorAll('.r-perm').forEach(function(c){ c.checked = d.perms.indexOf(c.value) >= 0; });
+    refreshAllGroups();
+    document.getElementById('role-form-title').textContent = '编辑角色：' + d.label;
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+});
+document.getElementById('r-reset').addEventListener('click', function(){
+  document.getElementById('role-form').reset();
+  document.getElementById('r-id').value = '';
+  document.getElementById('r-key').readOnly = false;
+  document.getElementById('role-form-title').textContent = '新增角色';
+  refreshAllGroups();
+});
+</script>
+{% endblock %}

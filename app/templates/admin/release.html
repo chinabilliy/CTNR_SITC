@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}放箱确认 · 短租箱 EIR{% endblock %}
+{% block content %}
+<div class="page-head"><h1>放箱确认</h1></div>
+<div class="card">
+  <p class="muted">前台登记的堆场仅供参考，可在「堆场」列逐票调整后再放箱；系统按调整后的「箱型 + 堆场」筛选有库存批次，优先级 1 最高，单批不足时自动拆单。改堆场后原「指定起租号」不再生效，改为自动分配，也可用下方下拉统一改派批次。</p>
+  <div class="form-row">
+    <label>统一指定起租号（改派，可留空）<select name="manual_batch" id="manual-batch">
+      <option value="">— 自动分配 —</option>
+      {% for b in batches %}
+      <option value="{{ b.id }}">{{ b.yard_short }} / {{ b.lease_no }} / {{ b.container_type or '—' }} / 余{{ b.available or 0 }}</option>
+      {% endfor %}
+    </select></label>
+    <button type="button" class="btn primary" id="release-confirm-btn">确认放箱所选</button>
+  </div>
+  <table class="grid">
+    <thead><tr><th><input type="checkbox" id="check-all"></th><th>ID</th><th>船名</th><th>航次</th><th>提单号</th><th>箱型</th><th>数量</th><th>堆场（可改）</th><th>指定起租号</th><th>实际起租号</th><th>状态</th><th>打印次数</th><th>操作</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <td>{% if r.status=='pending' %}<input type="checkbox" name="ids" value="{{ r.id }}" class="pick-check">{% endif %}</td>
+        <td>{{ r.id }}</td><td>{{ r.vessel }}</td><td>{{ r.voyage }}</td><td>{{ r.bl_no }}</td>
+        <td>{{ r.container_type }}</td><td>{{ r.quantity }}</td>
+        <td>{% if r.status=='pending' %}
+          <select name="yard_{{ r.id }}" class="yard-select">
+            {% for y in yards %}<option value="{{ y.id }}" {{ 'selected' if y.id==r.yard_id }}>{{ y.short_name }}</option>{% endfor %}
+          </select>
+          {% else %}{{ r.yard_short }}{% endif %}</td>
+        <td>{{ r.requested_lease_no or '—' }}</td>
+        <td>{{ r.allocated_lease_no or '—' }}</td>
+        <td><span class="badge {{ 'ok' if r.status=='released' else 'pending' }}">{{ '已放箱' if r.status=='released' else '待放箱' }}</span></td>
+        <td>{{ r.eir_print_count }}</td>
+        <td class="ops">
+          {% if r.status=='released' %}
+          {% if r.eir_print_count > 0 %}
+          <form method="post" action="{{ url_for('admin.release_reset_print', pid=r.id) }}" class="inline">
+            <button type="submit" class="link" data-confirm="确定将该提单下所有 EIR 的打印次数重置为 0？重置后可重新打印。">重置次数</button>
+          </form>
+          {% endif %}
+          <form method="post" action="{{ url_for('admin.release_reset', pid=r.id) }}" class="inline">
+            <button type="submit" class="link danger" data-confirm="撤销放箱并回补库存？仅当 EIR 未打印时允许。">撤销</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('check-all').addEventListener('change', function(){
+  document.querySelectorAll('.pick-check').forEach(function(c){ c.checked = this.checked; }, this);
+});
+document.getElementById('release-confirm-btn').addEventListener('click', function(){
+  var ids = Array.prototype.filter.call(document.querySelectorAll('.pick-check'), function(c){return c.checked;})
+                 .map(function(c){return c.value;});
+  if(!ids.length){ alert('请先勾选要放箱的记录'); return; }
+  var form = document.createElement('form');
+  form.method = 'post';
+  form.action = '{{ url_for("admin.release_confirm") }}';
+  ids.forEach(function(id){
+    var inp = document.createElement('input');
+    inp.type = 'hidden'; inp.name = 'ids'; inp.value = id;
+    form.appendChild(inp);
+    var y = document.querySelector('[name="yard_' + id + '"]');
+    if (y) {
+      var yi = document.createElement('input');
+      yi.type = 'hidden'; yi.name = 'yard_' + id; yi.value = y.value;
+      form.appendChild(yi);
+    }
+  });
+  var mb = document.createElement('input');
+  mb.type = 'hidden'; mb.name = 'manual_batch';
+  mb.value = document.getElementById('manual-batch').value;
+  form.appendChild(mb);
+  document.body.appendChild(form);
+  form.submit();
+});
+</script>
+{% endblock %}

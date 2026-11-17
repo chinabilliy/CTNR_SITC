@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}EIR 打印预览 · 短租箱 EIR{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/eir.css') }}">
+<style>
+  .print-toolbar{ position: sticky; top: 0; z-index: 10; background:#fff; padding:12px 0; border-bottom:1px solid #ddd; }
+  @media print { .print-toolbar{ display:none !important; } }
+</style>
+{% endblock %}
+{% block content %}
+<div class="print-toolbar no-print">
+  <a class="btn" href="{{ url_for('print.print_list') }}">← 返回列表</a>
+  <span style="margin-left:12px">共 <strong>{{ eirs|length }}</strong> 张 EIR，每张一页 A4</span>
+  <button class="btn primary" id="do-print" style="margin-left:12px">{% if confirm_info %}重印{% else %}打印{% endif %}（将计入次数）</button>
+  <p class="muted small" style="margin:6px 0 0">打印对话框：纸张 A4、缩放 100%、<strong>取消勾选「页眉和页脚」</strong>。点击打印按钮后立即计入打印次数。</p>
+</div>
+
+<div id="eir-pages">
+{% for e in eirs %}
+  {% set key = e.template_key or 'tianxiang' %}
+  {% include 'eir/' ~ key ~ '.html' %}
+{% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('do-print').addEventListener('click', function(){
+  {% if confirm_info %}
+  if(!window.confirm(
+      '本批共 {{ confirm_info.total }} 张 EIR，其中 {{ confirm_info.reprint_count }} 张已打印过'
+      + '（最高已打印 {{ confirm_info.max_printed }} 次）。\n'
+      + '继续将把已打印的一并重印，打印次数各 +1，最高将增至 {{ confirm_info.next_max }} 次。\n'
+      + '确认继续打印？')) { return; }
+  {% endif %}
+  var ids = {{ eirs|map(attribute='id')|list|tojson }};
+  fetch('{{ url_for("print.print_mark") }}', {
+    method:'POST',
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body:'ids=' + ids.join(',')
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if(d.ok){ window.print(); }
+    else { alert(d.msg || '标记打印次数失败'); }
+  }).catch(function(){ alert('标记打印次数失败，请重试后再打印'); });
+});
+</script>
+{% endblock %}

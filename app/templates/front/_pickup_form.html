@@ -1,0 +1,26 @@
+{% macro pickup_form(p, yards, types, action) %}
+<form method="post" action="{{ action }}" class="form">
+  <div class="row">
+    <label>船名<input name="vessel" value="{{ p.vessel if p else '' }}" required></label>
+    <label>航次<input name="voyage" value="{{ p.voyage if p else '' }}" required></label>
+  </div>
+  <div class="row">
+    <label>提单号<input name="bl_no" value="{{ p.bl_no if p else '' }}" required></label>
+    <label>箱型<select name="container_type">
+      {% for t in types %}<option value="{{ t }}" {{ 'selected' if p and p.container_type==t }}>{{ t }}</option>{% endfor %}
+    </select></label>
+  </div>
+  <div class="row">
+    <label>数量<input type="number" name="quantity" min="1" value="{{ p.quantity if p else 1 }}" required></label>
+    <label>堆场（参考，后台放箱时可调整）<select name="yard_id" required>
+      <option value="">— 选择堆场 —</option>
+      {% for y in yards %}<option value="{{ y.id }}" {{ 'selected' if p and p.yard_id==y.id }}>{{ y.short_name }}</option>{% endfor %}
+    </select></label>
+  </div>
+  <div class="row">
+    <label>指定起租号（可留空，由后台自动分配）<input name="lease_no" value="{{ p.requested_lease_no if p and p.requested_lease_no else '' }}"></label>
+  </div>
+  <button type="submit" class="btn primary">保存</button>
+  <a class="btn" href="{{ url_for('front.pickups') }}">取消</a>
+</form>
+{% endmacro %}

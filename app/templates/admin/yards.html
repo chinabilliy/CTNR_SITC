@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}堆场信息 · 短租箱 EIR{% endblock %}
+{% block content %}
+<div class="page-head"><h1>堆场信息</h1></div>
+<div class="card">
+<table class="grid">
+  <thead><tr><th>ID</th><th>堆场全称</th><th>简称</th><th>地址</th><th>电话</th><th>作业时间</th><th>模板</th><th>操作</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td>{{ r.id }}</td><td>{{ r.full_name }}</td><td>{{ r.short_name }}</td>
+      <td>{{ r.address }}</td><td>{{ r.phone }}</td><td>{{ r.work_hours }}</td><td>{{ r.template_key }}</td>
+      <td class="ops"><button class="link" data-edit-yards='{{ r|tojson }}'>编辑</button>
+        <form class="inline" method="post" action="{{ url_for('admin.yard_delete', yid=r.id) }}">
+          <button type="submit" class="link danger" data-confirm="确定删除？">删除</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<div class="card">
+  <h3 id="yard-form-title">新增堆场</h3>
+  <form method="post" action="{{ url_for('admin.yard_save') }}" class="form" id="yard-form">
+    <input type="hidden" name="id" id="y-id">
+    <div class="row"><label>堆场全称<input name="full_name" id="y-full" required></label><label>简称<input name="short_name" id="y-short" required></label></div>
+    <div class="row"><label>堆场地址<input name="address" id="y-addr"></label><label>联系电话<input name="phone" id="y-phone"></label></div>
+    <div class="row"><label>作业时间<input name="work_hours" id="y-hours"></label></div>
+    <button type="submit" class="btn primary">保存</button>
+    <button type="button" class="btn" id="y-reset">清空</button>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll('[data-edit-yards]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var d = JSON.parse(this.getAttribute('data-edit-yards'));
+    document.getElementById('y-id').value = d.id;
+    document.getElementById('y-full').value = d.full_name || '';
+    document.getElementById('y-short').value = d.short_name || '';
+    document.getElementById('y-addr').value = d.address || '';
+    document.getElementById('y-phone').value = d.phone || '';
+    document.getElementById('y-hours').value = d.work_hours || '';
+    document.getElementById('yard-form-title').textContent = '编辑堆场 #' + d.id;
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+});
+document.getElementById('y-reset').addEventListener('click', function(){
+  document.getElementById('yard-form').reset();
+  document.getElementById('y-id').value = '';
+  document.getElementById('yard-form-title').textContent = '新增堆场';
+});
+</script>
+{% endblock %}

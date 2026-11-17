@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}EIR 打印 · 短租箱 EIR{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>EIR 打印</h1>
+  <a class="btn" href="{{ url_for('print.print_help') }}">打印设置说明</a>
+</div>
+<div class="card">
+  <p class="muted">勾选提单号，打印该提单下所有已放箱的 EIR，每张 EIR 一页 A4。<strong>点击「打印」即计入打印次数</strong>，请确认打印机就绪后再点。</p>
+  {% if reprint_on %}<p class="flash ok">管理员已开启重印：已打印的提单可再次勾选重印，仍会累加次数；点打印时会弹窗确认。</p>{% endif %}
+  <table class="grid">
+    <thead><tr><th><input type="checkbox" id="check-all"></th><th>提单号</th><th>船名</th><th>航次</th><th>EIR 总数</th><th>累计打印次数</th><th>{{ '可打印' if reprint_on else '待打印' }}</th><th>操作</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <td>{% if r.pending and r.pending > 0 %}<input type="checkbox" class="bl-check" value="{{ r.bl_no }}">{% endif %}</td>
+        <td>{{ r.bl_no }}</td><td>{{ r.vessel }}</td><td>{{ r.voyage }}</td>
+        <td>{{ r.total }}</td><td>{{ r.eir_print_count }}</td><td>{{ r.pending or 0 }}</td>
+        <td class="ops">
+          {% if r.pending and r.pending > 0 %}
+          <button class="btn small print-bl" data-bl="{{ r.bl_no }}">{% if reprint_on and r.printed_cnt and r.printed_cnt > 0 %}重印{% else %}打印{% endif %} {{ r.pending }} 张</button>
+          {% else %}<span class="muted">已全部打印</span>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <button class="btn primary" id="print-selected">打印所选提单</button>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('check-all').addEventListener('change', function(){
+  document.querySelectorAll('.bl-check').forEach(function(c){ c.checked = this.checked; }, this);
+});
+function gotoPrint(bls){
+  if(!bls.length){ alert('请先勾选提单号'); return; }
+  window.location.href = '{{ url_for("print.print_sheet") }}?bls=' + encodeURIComponent(bls.join(',')) + '&stamp=' + Date.now();
+}
+document.querySelectorAll('.print-bl').forEach(function(b){
+  b.addEventListener('click', function(){ gotoPrint([this.getAttribute('data-bl')]); });
+});
+document.getElementById('print-selected').addEventListener('click', function(){
+  var bls = Array.prototype.filter.call(document.querySelectorAll('.bl-check'), function(c){return c.checked;})
+                  .map(function(c){return c.value;});
+  gotoPrint(bls);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}提箱登记 · 短租箱 EIR{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>提箱登记</h1>
+  <div>
+    <a class="btn" href="{{ url_for('front.import_excel') }}">Excel 导入</a>
+    <a class="btn primary" href="{{ url_for('front.pickup_add') }}">+ 新增登记</a>
+  </div>
+</div>
+<div class="card">
+<table class="grid">
+  <thead><tr>
+    <th>ID</th><th>船名</th><th>航次</th><th>提单号</th><th>箱型</th><th>数量</th>
+    <th>堆场</th><th>指定起租号</th><th>实际起租号</th><th>状态</th><th>EIR 数</th><th>打印次数</th><th>操作</th>
+  </tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td>{{ r.id }}</td><td>{{ r.vessel }}</td><td>{{ r.voyage }}</td><td>{{ r.bl_no }}</td>
+      <td>{{ r.container_type }}</td><td>{{ r.quantity }}</td><td>{{ r.yard_short }}</td>
+      <td>{{ r.requested_lease_no or '—' }}</td>
+      <td>{{ r.allocated_lease_no or '—' }}</td>
+      <td><span class="badge {{ 'ok' if r.status=='released' else 'pending' }}">{{ '已放箱' if r.status=='released' else '待放箱' }}</span></td>
+      <td>{{ r.eir_count }}</td><td>{{ r.eir_print_count }}</td>
+      <td class="ops">
+        {% if r.status == 'pending' %}
+        <a href="{{ url_for('front.pickup_edit', pid=r.id) }}">编辑</a>
+        <form class="inline" method="post" action="{{ url_for('front.pickup_delete', pid=r.id) }}">
+          <button type="submit" class="link danger" data-confirm="确定删除该登记？">删除</button>
+        </form>
+        {% else %}—{% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="13" class="empty">暂无记录</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% from "front/_pickup_form.html" import pickup_form %}
+{% block title %}新增提箱登记 · 短租箱 EIR{% endblock %}
+{% block content %}
+<div class="page-head"><h1>新增提箱登记</h1></div>
+<div class="card">
+  {{ pickup_form(None, yards, types, url_for('front.pickup_add')) }}
+</div>
+{% endblock %}

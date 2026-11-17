@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}系统设置 · 短租箱 EIR{% endblock %}
+{% block content %}
+<div class="page-head"><h1>系统设置</h1></div>
+<div class="card">
+  <form method="post" class="form">
+    <label>EIR 号前缀<input name="eir_no_prefix" value="{{ vals.eir_no_prefix }}"></label>
+    <label>单批库存不足时允许拆单<select name="allow_split">
+      <option value="1" {{ 'selected' if vals.allow_split=='1' }}>允许</option>
+      <option value="0" {{ 'selected' if vals.allow_split!='1' }}>不允许</option>
+    </select></label>
+    <label>允许对已打印的 EIR 再次打印<select name="allow_reprint">
+      <option value="1" {{ 'selected' if vals.allow_reprint=='1' }}>允许（重印会再次累加次数）</option>
+      <option value="0" {{ 'selected' if vals.allow_reprint!='1' }}>不允许（默认）</option>
+    </select></label>
+    <button type="submit" class="btn primary">保存</button>
+  </form>
+  <p class="muted small">当前流水：{{ vals.eir_seq_date }} / {{ vals.eir_seq }}</p>
+</div>
+{% endblock %}

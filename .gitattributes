@@ -1,0 +1,12 @@
+# 统一文本换行符，避免跨平台/分支合并时产生大量差异
+* text=auto eol=lf
+
+# 二进制文件：禁止换行符转换与文本 diff
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.docx binary
+*.xlsx binary
+*.db   binary

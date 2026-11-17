@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}用户管理 · 短租箱 EIR{% endblock %}
+{% block content %}
+<div class="page-head"><h1>用户管理</h1></div>
+<div class="card">
+<p class="muted">可编辑任一用户；删除仅对非当前登录账号有效，且最后一个启用的管理员不可删除。删除后，该用户创建的登记记录会保留，创建人/确认人信息将清空。</p>
+<table class="grid">
+  <thead><tr><th>ID</th><th>账号</th><th>角色</th><th>显示名</th><th>状态</th><th>最近登录</th><th>操作</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td>{{ r.id }}</td><td>{{ r.username }}</td><td>{{ role_label(r.role) }}</td>
+      <td>{{ r.display_name or '' }}</td><td>{{ '启用' if r.active else '停用' }}</td><td>{{ r.last_login_at or '—' }}</td>
+      <td class="ops"><button class="link" data-user-edit='{{ r|tojson }}'>编辑</button>
+        {% if me and me.id == r.id %}
+        <span class="muted" title="不能删除当前登录的账号">删除（当前账号）</span>
+        {% else %}
+        <form class="inline" method="post" action="{{ url_for('admin.user_delete', uid=r.id) }}">
+          <button type="submit" class="link danger" data-confirm="确定删除用户「{{ r.username }}」？此操作不可恢复。">删除</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<div class="card">
+  <h3 id="user-form-title">新增用户</h3>
+  <form method="post" action="{{ url_for('admin.user_save') }}" class="form" id="user-form">
+    <input type="hidden" name="id" id="u-id">
+    <div class="row">
+      <label>账号<input name="username" id="u-name" required></label>
+      <label>显示名<input name="display_name" id="u-display"></label>
+    </div>
+    <div class="row">
+      <label>密码（新增必填，编辑留空不改）<input type="password" name="password" id="u-pwd"></label>
+      <label>角色<select name="role" id="u-role">
+        {% for rr in roles %}<option value="{{ rr.key }}">{{ rr.label }}</option>{% endfor %}
+      </select></label>
+    </div>
+    <label><input type="checkbox" name="active" id="u-active" checked> 启用</label>
+    <button type="submit" class="btn primary">保存</button>
+    <button type="button" class="btn" id="u-reset">清空</button>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll('[data-user-edit]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var d = JSON.parse(this.getAttribute('data-user-edit'));
+    document.getElementById('u-id').value = d.id;
+    document.getElementById('u-name').value = d.username;
+    document.getElementById('u-display').value = d.display_name || '';
+    document.getElementById('u-role').value = d.role;
+    document.getElementById('u-active').checked = !!d.active;
+    document.getElementById('user-form-title').textContent = '编辑用户 #' + d.id;
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+});
+document.getElementById('u-reset').addEventListener('click', function(){
+  document.getElementById('user-form').reset();
+  document.getElementById('u-id').value = '';
+  document.getElementById('user-form-title').textContent = '新增用户';
+});
+</script>
+{% endblock %}
