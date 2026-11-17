@@ -48,6 +48,7 @@ h1,h2,h3 { color:#1f2d3d; }
 .grid tr:hover td { background:#fafbfc; }
 .grid .empty { text-align:center; color:#9aa0a6; padding:24px; }
 .yard-select { padding:4px; max-width:130px; }
+.remark-cell { max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#444; }
 .ops { white-space:nowrap; }
 .ops a, .ops button, .link { color:#1a63c9; background:none; border:0; cursor:pointer; padding:0; font-size:13px; }
 .link:hover { text-decoration:underline; }
@@ -55,7 +56,7 @@ h1,h2,h3 { color:#1f2d3d; }
 .inline { display:inline; }
 .inline-label { display:inline-flex; align-items:center; gap:2px; }
 
-.badge { padding:2px 8px; border-radius:10px; font-size:12px; }
+.badge { padding:2px 8px; border-radius:10px; font-size:12px; white-space:nowrap; display:inline-block; }
 .badge.ok { background:#e7f6ec; color:#176b3a; }
 .badge.pending { background:#fff3d6; color:#8a5a00; }
 

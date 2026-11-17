@@ -48,12 +48,13 @@ def generate_for_plan(conn, pickup, plan):
             cur = conn.execute(
                 "INSERT INTO eir_records(eir_no,pickup_id,batch_id,"
                 "yard_name_snapshot,yard_address_snapshot,yard_phone_snapshot,work_hours_snapshot,"
-                "vessel,voyage,bl_no,container_type,lease_no_snapshot,image_path_snapshot,"
-                "print_count,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)",
+                "vessel,voyage,bl_no,container_type,lease_no_snapshot,remark_snapshot,"
+                "image_path_snapshot,print_count,created_at) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)",
                 (eir_no, pickup["id"], batch_id,
                  yard["full_name"], yard["address"], yard["phone"], yard["work_hours"],
                  pickup["vessel"], pickup["voyage"], pickup["bl_no"], pickup["container_type"],
-                 batch["lease_no"], img, now()),
+                 batch["lease_no"], batch["remark"], img, now()),
             )
             created.append(cur.lastrowid)
     return created

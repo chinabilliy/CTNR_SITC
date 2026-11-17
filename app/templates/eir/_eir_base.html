@@ -5,18 +5,21 @@
     <img class="eir-img" src="{{ e.image_path_snapshot }}" alt="放箱通知单">
   </div>
   <div class="eir-info">
-    <div class="eir-yard">
-      <div class="eir-yard-title">{{ name_label }}：{{ e.yard_name_snapshot }}</div>
-      <div>堆场地址：{{ e.yard_address_snapshot }}</div>
-      <div>堆场电话：{{ e.yard_phone_snapshot }}</div>
-      <div>作业时间：{{ e.work_hours_snapshot }}</div>
+    <div class="eir-cols">
+      <div class="eir-yard">
+        <div class="eir-yard-title">{{ name_label }}：{{ e.yard_name_snapshot }}</div>
+        <div>堆场地址：{{ e.yard_address_snapshot }}</div>
+        <div>堆场电话：{{ e.yard_phone_snapshot }}</div>
+        <div>作业时间：{{ e.work_hours_snapshot }}</div>
+      </div>
+      <div class="eir-ship">
+        <div>船名：{{ e.vessel }}</div>
+        <div>航次：{{ e.voyage }}</div>
+        <div>提单号：{{ e.bl_no }}</div>
+        <div>箱型：{{ e.container_type }}</div>
+      </div>
     </div>
-    <div class="eir-ship">
-      <div>船名：{{ e.vessel }}</div>
-      <div>航次：{{ e.voyage }}</div>
-      <div>提单号：{{ e.bl_no }}</div>
-      <div>箱型：{{ e.container_type }}</div>
-    </div>
+    {% if e.remark_snapshot %}<div class="eir-remark"><span class="eir-remark-label">备注：</span>{{ e.remark_snapshot }}</div>{% endif %}
   </div>
 </section>
 {% endmacro %}

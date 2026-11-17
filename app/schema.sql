@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS eir_records (
   work_hours_snapshot TEXT,
   vessel TEXT, voyage TEXT, bl_no TEXT, container_type TEXT,
   lease_no_snapshot TEXT,
+  remark_snapshot TEXT,
   image_path_snapshot TEXT,
   print_count INTEGER NOT NULL DEFAULT 0,
   printed_at  TEXT,

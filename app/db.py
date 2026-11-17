@@ -155,11 +155,25 @@ def _migrate_role_perms(conn):
     conn.commit()
 
 
+def _ensure_columns(conn):
+    """老库补列：CREATE TABLE IF NOT EXISTS 不会给已存在的表加新列。
+
+    - eir_records.remark_snapshot：起租号批次备注的快照（2026-11 新增）
+    """
+    def cols(table):
+        return {r["name"] for r in conn.execute("PRAGMA table_info(%s)" % table).fetchall()}
+
+    if "remark_snapshot" not in cols("eir_records"):
+        conn.execute("ALTER TABLE eir_records ADD COLUMN remark_snapshot TEXT")
+        conn.commit()
+
+
 def init_db():
     os.makedirs(config.DATA_DIR, exist_ok=True)
     conn = connect()
     with open(config.SCHEMA_PATH, "r", encoding="utf-8") as f:
         conn.executescript(f.read())
+    _ensure_columns(conn)
     _migrate_users_role(conn)
     _ensure_roles(conn)
     _migrate_role_perms(conn)
