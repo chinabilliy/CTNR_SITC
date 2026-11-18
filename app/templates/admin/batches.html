@@ -55,6 +55,7 @@
       <label>40GP 库存<input type="number" name="stock_40GP" id="b-40" min="0"></label>
       <label>40HC 库存<input type="number" name="stock_40HC" id="b-40hc" min="0"></label>
     </div>
+    <p class="muted small">库存留空 = 不修改该箱型；填 0 = 清零。</p>
     <div class="row"><label>备注<input name="remark" id="b-remark" placeholder="会打印在每张 EIR 上"></label>
       <label>状态<select name="status" id="b-status"><option value="active">启用</option><option value="closed">关闭</option></select></label></div>
     <button type="submit" class="btn primary">保存</button>
@@ -73,7 +74,10 @@ document.querySelectorAll('[data-batch-edit]').forEach(function(btn){
     document.getElementById('b-prio').value = d.priority;
     document.getElementById('b-remark').value = d.remark || '';
     document.getElementById('b-status').value = d.status;
-    document.getElementById('batch-form-title').textContent = '编辑批次 #' + d.id + '（库存请在上方行内直接修改）';
+    document.getElementById('b-20').value = d.stock_20GP === '' || d.stock_20GP == null ? '' : d.stock_20GP;
+    document.getElementById('b-40').value = d.stock_40GP === '' || d.stock_40GP == null ? '' : d.stock_40GP;
+    document.getElementById('b-40hc').value = d.stock_40HC === '' || d.stock_40HC == null ? '' : d.stock_40HC;
+    document.getElementById('batch-form-title').textContent = '编辑批次 #' + d.id + '（库存也可在上方行内直接改）';
     window.scrollTo(0, document.body.scrollHeight);
   });
 });

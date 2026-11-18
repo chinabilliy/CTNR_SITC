@@ -96,6 +96,11 @@ def batches():
     stock_map = {}
     for s in db.execute("SELECT batch_id,container_type,available FROM batch_stock"):
         stock_map.setdefault(s["batch_id"], {})[s["container_type"]] = s["available"]
+    # 把库存并进每行，供「编辑」按钮回填下方表单的库存输入框
+    for r in rows:
+        st = stock_map.get(r["id"], {})
+        for ct in config.CONTAINER_TYPES:
+            r["stock_" + ct] = st.get(ct, "")
     yards = db.execute("SELECT * FROM yards ORDER BY short_name").fetchall()
     return render_template("admin/batches.html", rows=rows, stock_map=stock_map, yards=yards, types=config.CONTAINER_TYPES)
 
@@ -121,6 +126,7 @@ def batch_save():
             "UPDATE lease_batches SET yard_id=?,lease_no=?,priority=?,remark=?,status=?,updated_at=? WHERE id=?",
             (yard_id, lease, prio, f.get("remark", "").strip(), f.get("status", "active"), now(), int(bid)),
         )
+        bid = int(bid)
     else:
         cur = db.execute(
             "INSERT INTO lease_batches(yard_id,lease_no,priority,remark,status,created_at,updated_at) "
@@ -128,16 +134,29 @@ def batch_save():
             (yard_id, lease, prio, f.get("remark", "").strip(), f.get("status", "active"), now(), now()),
         )
         bid = cur.lastrowid
-        for ct in config.CONTAINER_TYPES:
-            raw = f.get("stock_" + ct, "").strip()
-            if raw != "":
-                db.execute(
-                    "INSERT OR REPLACE INTO batch_stock(batch_id,container_type,available,updated_at) VALUES(?,?,?,?)",
-                    (bid, ct, max(0, int(float(raw))), now()),
-                )
+    # 库存：新增与编辑都要写。原实现只在新增分支写库存，
+    # 导致编辑批次时改库存点保存「已保存」却无效果。
+    _save_stock(db, bid, f)
     db.commit()
     flash("已保存", "ok")
     return redirect(url_for("admin.batches"))
+
+
+def _save_stock(db, bid, form):
+    """写批次库存：留空=不改（编辑时避免误清零），显式填 0=清零。
+
+    新增批次时留空视为不建该箱型库存行，与原行为一致。
+    """
+    for ct in config.CONTAINER_TYPES:
+        raw = form.get("stock_" + ct, "").strip()
+        if raw == "":
+            continue
+        val = max(0, int(float(raw)))
+        db.execute(
+            "INSERT INTO batch_stock(batch_id,container_type,available,updated_at) VALUES(?,?,?,?) "
+            "ON CONFLICT(batch_id,container_type) DO UPDATE SET available=excluded.available,updated_at=excluded.updated_at",
+            (bid, ct, val, now()),
+        )
 
 
 @bp.route("/admin/batches/<int:bid>/stock", methods=["POST"])
