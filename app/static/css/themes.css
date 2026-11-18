@@ -1,0 +1,151 @@
+/* ============================================================
+   themes.css — 主题唯一来源（设计 token + 多套可切换主题）
+   约定：业务样式（app.css）只引用 var(--*)，不写死颜色；
+        换肤只改本文件 / 后台设置 ui_theme，不碰业务逻辑。
+   作用域：:root 为默认主题；html[data-theme="xxx"] 覆盖。
+   ============================================================ */
+
+/* ---------- 默认主题：蓝白（与原视觉一致） ---------- */
+:root {
+  /* 页面基底 */
+  --bg-page: #f5f6f8;
+  --bg-card: #ffffff;
+  --bg-subtle: #fafbfc;        /* 次级面板底（权限分组等） */
+  --bg-th: #f3f5f8;            /* 表头底 */
+  --bg-row-hover: #fafbfc;
+
+  /* 文字 */
+  --text-main: #222222;
+  --text-strong: #1f2d3d;      /* 标题 */
+  --text-secondary: #444444;
+  --text-muted: #6b7280;
+  --text-faint: #9aa0a6;
+  --text-disabled: #aaaaaa;
+
+  /* 边框 / 输入 */
+  --border: #e2e5ea;
+  --border-input: #ccd2dc;
+  --border-btn: #c8ced8;
+  --border-chip: #d7dce5;
+
+  /* 品牌主色 */
+  --primary: #1a63c9;
+  --primary-hover: #1552ab;
+  --on-primary: #ffffff;
+  --link: #1a63c9;
+  --danger: #c02020;
+
+  /* 按钮（次要） */
+  --btn-bg: #ffffff;
+  --btn-text: #333333;
+  --btn-hover: #f0f2f5;
+
+  /* 侧边导航（深色系） */
+  --side-bg: #1f2d3d;
+  --side-text: #cbd5e1;
+  --side-title: #ffffff;
+  --side-sub: #8fa3bb;
+  --side-hover: rgba(255, 255, 255, .08);
+  --side-border: rgba(255, 255, 255, .1);
+  --side-active-bg: #1a63c9;
+  --side-active-text: #ffffff;
+
+  /* 状态色 */
+  --ok-bg: #e7f6ec;   --ok-text: #176b3a;   --ok-border: #b6e0c4;
+  --err-bg: #fdeaea;  --err-text: #a02020;  --err-border: #f2c0c0;
+  --warn-bg: #fff3d6; --warn-text: #8a5a00;
+
+  /* 阴影 */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, .03);
+}
+
+/* ---------- 主题：海洋绿 ---------- */
+html[data-theme="ocean"] {
+  --bg-page: #f2f7f5;
+  --bg-th: #eaf3ef;
+  --bg-row-hover: #f4faf7;
+  --bg-subtle: #f4faf7;
+  --text-strong: #123c33;
+  --border: #d8e6e0;
+  --border-input: #c3d8d0;
+  --border-btn: #bcd2ca;
+  --border-chip: #cfe0d9;
+  --primary: #0e7a5f;
+  --primary-hover: #0a624c;
+  --link: #0e7a5f;
+  --btn-hover: #e8f2ee;
+  --side-bg: #123c33;
+  --side-sub: #8fb8ab;
+  --side-active-bg: #0e7a5f;
+}
+
+/* ---------- 主题：暗夜（深色） ---------- */
+html[data-theme="dark"] {
+  --bg-page: #14181f;
+  --bg-card: #1d232d;
+  --bg-subtle: #232a36;
+  --bg-th: #232a36;
+  --bg-row-hover: #262e3b;
+  --text-main: #d7dde6;
+  --text-strong: #eef2f7;
+  --text-secondary: #c2cad6;
+  --text-muted: #93a0b4;
+  --text-faint: #6d7a8f;
+  --text-disabled: #5a6577;
+  --border: #303a49;
+  --border-input: #3a4657;
+  --border-btn: #3a4657;
+  --border-chip: #3a4657;
+  --primary: #4c8dff;
+  --primary-hover: #3a76e0;
+  --link: #6ba3ff;
+  --danger: #ff6b6b;
+  --btn-bg: #232a36;
+  --btn-text: #d7dde6;
+  --btn-hover: #2c3542;
+  --side-bg: #10141b;
+  --side-text: #aeb9c9;
+  --side-sub: #77839a;
+  --side-active-bg: #4c8dff;
+  --ok-bg: #17351f;   --ok-text: #7fd69a;   --ok-border: #2c5a3a;
+  --err-bg: #3d1a1a;  --err-text: #ff9c9c;  --err-border: #6b2c2c;
+  --warn-bg: #3a2f14; --warn-text: #e8c56a;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, .4);
+}
+
+/* ---------- 主题：暖橙 ---------- */
+html[data-theme="sunset"] {
+  --bg-page: #faf6f1;
+  --bg-th: #f5ece2;
+  --bg-row-hover: #fbf4ec;
+  --bg-subtle: #fbf4ec;
+  --text-strong: #4a2e1a;
+  --border: #e8ddd0;
+  --border-input: #d9c8b6;
+  --border-btn: #d3c0ac;
+  --border-chip: #e0d2c2;
+  --primary: #c2571b;
+  --primary-hover: #a34715;
+  --link: #c2571b;
+  --btn-hover: #f3e8dc;
+  --side-bg: #3d2a1c;
+  --side-sub: #c0a186;
+  --side-active-bg: #c2571b;
+}
+
+/* ---------- 主题预览色卡（后台设置页用） ---------- */
+.theme-cards { display: flex; gap: 14px; flex-wrap: wrap; margin: 6px 0 14px; }
+.theme-card {
+  display: flex; flex-direction: column; gap: 8px; width: 150px;
+  padding: 12px; border: 2px solid var(--border); border-radius: 8px;
+  background: var(--bg-card); cursor: pointer; font-weight: normal !important;
+  margin: 0 !important;
+}
+.theme-card:hover { border-color: var(--primary); }
+.theme-card input { display: none; }
+.theme-card.selected { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+.theme-card .tc-name { font-weight: 600; color: var(--text-strong); font-size: 13px; }
+.theme-card .tc-preview { display: flex; height: 44px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+.theme-card .tc-side { width: 34%; }
+.theme-card .tc-main { flex: 1; padding: 5px; display: flex; flex-direction: column; gap: 4px; }
+.theme-card .tc-bar { height: 7px; border-radius: 2px; }

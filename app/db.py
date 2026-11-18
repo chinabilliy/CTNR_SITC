@@ -16,6 +16,7 @@ DEFAULT_SETTINGS = {
     "allow_split": "1",
     "mark_print_after_confirm": "0",
     "allow_reprint": "0",
+    "ui_theme": "default",
 }
 
 # 内置角色的权限点 = 导航菜单 endpoint（与 app/nav.py 保持一致）。

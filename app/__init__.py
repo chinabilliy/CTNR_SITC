@@ -34,12 +34,24 @@ def create_app():
         from flask import request
         from .auth import current_user, role_label, role_perms
         from .nav import build_menu
+        from .db import connect
+        from . import themes
         me = current_user()
         perms = role_perms(me["role"]) if me else set()
+        # UI 主题：独立短连接读取（登录页无 g.db 也可用），失败回落默认
+        ui_theme = themes.DEFAULT_THEME
+        try:
+            conn = connect()
+            row = conn.execute("SELECT value FROM settings WHERE key='ui_theme'").fetchone()
+            conn.close()
+            ui_theme = themes.normalize(row["value"] if row else "")
+        except Exception:
+            pass
         return {
             "me": me,
             "role_label": role_label,
             "nav_menu": build_menu(perms, request.endpoint),
+            "ui_theme": ui_theme,
         }
 
     @app.errorhandler(403)

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="{{ ui_theme }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{% block title %}短租箱 EIR 系统{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 {% block head %}{% endblock %}
 </head>

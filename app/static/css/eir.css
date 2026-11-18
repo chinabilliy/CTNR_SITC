@@ -1,4 +1,6 @@
-/* EIR A4 打印样式：一页一箱，一联 */
+/* EIR A4 打印样式：一页一箱，一联。
+   注意：单据区（.eir-sheet 及其子元素）刻意使用固定黑白值，
+   不引用主题变量 —— 任何 UI 主题下打印输出都必须是标准白纸黑字。 */
 @page { size: A4 portrait; margin: 25mm 32mm; }
 
 @media print {

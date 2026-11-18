@@ -3,7 +3,7 @@
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/eir.css') }}">
 <style>
-  .print-toolbar{ position: sticky; top: 0; z-index: 10; background:#fff; padding:12px 0; border-bottom:1px solid #ddd; }
+  .print-toolbar{ position: sticky; top: 0; z-index: 10; background:var(--bg-card); padding:12px 0; border-bottom:1px solid var(--border); }
   @media print { .print-toolbar{ display:none !important; } }
 </style>
 {% endblock %}

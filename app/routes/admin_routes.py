@@ -449,16 +449,20 @@ def export_excel():
 @bp.route("/admin/settings", methods=["GET", "POST"])
 @require_role("admin.settings")
 def settings():
+    from .. import themes
     db = get_db()
     if request.method == "POST":
         for key in ("allow_split", "eir_no_prefix", "allow_reprint"):
             if key in request.form:
                 set_setting(key, request.form[key].strip(), db)
+        if "ui_theme" in request.form:
+            set_setting("ui_theme", themes.normalize(request.form["ui_theme"].strip()), db)
         db.commit()
         flash("设置已保存", "ok")
     vals = {k: get_setting(k, db, "") for k in
-            ("allow_split", "eir_no_prefix", "eir_seq", "eir_seq_date", "allow_reprint")}
-    return render_template("admin/settings.html", vals=vals)
+            ("allow_split", "eir_no_prefix", "eir_seq", "eir_seq_date", "allow_reprint", "ui_theme")}
+    vals["ui_theme"] = themes.normalize(vals["ui_theme"])
+    return render_template("admin/settings.html", vals=vals, themes=themes.THEMES)
 
 
 @bp.route("/admin/users")
